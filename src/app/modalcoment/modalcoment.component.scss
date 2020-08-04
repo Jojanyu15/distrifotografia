@@ -1,0 +1,27 @@
+.iconobject{
+    font-size: 100%;
+    width: 100%;
+    height: 100%;
+    // color: red !important;
+}
+.comment{
+    display: block; /* or inline-block, at least its a block element */
+    width: 100%; /* or width is certain by parent element */
+    height: auto; /* height cannot be defined */
+    word-break: break-all; /*  */
+    word-wrap: break-word; /* if you want to cut the complete word */
+    white-space: normal; /* be sure its not 'nowrap'! ! ! :/ */
+}
+.sendB{
+    font-size:2rem;
+}
+.caja-vacia{
+    color:#C7C7C7;
+     padding-top: 5%;
+}
+.caja-vacia p{
+    font-size: 30px;
+ }
+.icono-grande{
+    font-size: 200px;
+}

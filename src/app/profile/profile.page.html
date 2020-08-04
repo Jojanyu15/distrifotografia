@@ -1,0 +1,113 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-title class="titulo">Perfil</ion-title>
+    <ion-buttons *ngIf="!ving" slot="secondary">
+      <ion-button (click)="goEditProfile()">
+        <ion-icon slot="start" name="cog"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons *ngIf="ving" slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+<ion-content [ngClass]="{'contenido': !ving }" *ngIf="profile">
+
+  <ion-row padding>
+    <!-- Avatar -->
+    <ion-col>
+      <img [src]="profile?.photoURL" class="avatar" alt="">
+    </ion-col>
+    <ion-col align-self: stretch>
+      <div>
+        <p no-margin no-padding><b>{{profile?.username}}</b></p>
+        <p no-padding no-margin class="info">{{profile.bio}}</p>
+      </div>
+    </ion-col>
+
+  </ion-row>
+  <div>
+    <ion-segment [(ngModel)]="profile_segment">
+      <ion-segment-button value="list">
+        <ion-icon name="list"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="grid">
+        <ion-icon name="apps"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+
+  <div [ngSwitch]="profile_segment">
+    <ion-list *ngSwitchCase="'grid'">
+      <ion-card *ngIf="images.length>0">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6" col-4 class="grid_img" *ngFor="let i of images"
+              (press)="pressPhoto(i?.creador, i?.creador, i?.photoCreador, i?.urlPath)">
+              <img [src]="i?.urlPath" alt="">
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card>
+      <ion-grid *ngIf="images.length==0">
+        <ion-row>
+          <ion-col text-center class="caja-vacia">
+            <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
+            <p>No hay ninguna fotografía por ahora</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'list'">
+      <ion-grid *ngIf="images.length==0">
+        <ion-row>
+          <ion-col text-center class="caja-vacia">
+            <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
+            <p>No hay ninguna fotografía por ahora</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <div  *ngFor="let i of images">
+        <ion-card>
+          <ion-item>
+            <ion-avatar slot="start">
+              <img [src]="i?.photoCreador">
+            </ion-avatar>
+            <ion-label>{{i?.creador}}</ion-label>
+            <ion-button *ngIf="i.userUid == authSvc.getCurrentUser().uid" (click)="mostrarMenu(i)"  fill="clear">
+              <ion-icon name="options"></ion-icon>
+            </ion-button>
+          </ion-item>
+          <ion-card-content>
+            <img [src]="i?.urlPath">
+          </ion-card-content>
+          <div>
+            <ion-segment>
+              <ion-segment-button>
+                <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+              </ion-segment-button>
+
+              <ion-segment-button (click)="verComentarios(i)">
+                <ion-icon name="text"></ion-icon>
+              </ion-segment-button>
+
+              <ion-segment-button (click)="goMetadata(i)">
+                <ion-icon name="information-circle-outline"></ion-icon>
+              </ion-segment-button>
+            </ion-segment>
+
+          </div>
+        </ion-card>
+      </div>
+    </ion-list>
+  </div>
+
+
+
+</ion-content>

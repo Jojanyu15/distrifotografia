@@ -1,0 +1,58 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Recursos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">CERRAR</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  <ion-list>
+    <ion-item (click)="goCourse()" button>
+      <ion-avatar slot="start">
+        <ion-icon   color="primary" class="iconobject" name="book"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>Curso de fotografia</h2>
+        <p class="desc">Aquí puedes ingresar y realizar el curso de fotografía!</p>
+      </ion-label>
+    </ion-item>
+    <ion-item (click)="goOVA()" button>
+      <ion-avatar slot="start">
+        <ion-icon color="primary" class="iconobject" name="cube"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>Repositorio de objetos OVA</h2>
+        <p class="desc">En esta sección encontrarás todo el material complementario que te puede servir para tomar mejores
+          fotografias!</p>
+      </ion-label>
+    </ion-item>
+    <ion-item (click)="goHumHub()" button>
+      <ion-avatar slot="start">
+        <ion-icon color="primary" class="iconobject" name="home"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>HumHub</h2>
+        <p class="desc">Aquí puedes acceder al sistema HumHub.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item (click)="goEncuesta()" button>
+      <ion-avatar slot="start">
+        <ion-icon color="primary" class="iconobject" name="checkmark"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>Encuesta</h2>
+        <p class="desc">Nos ayudarías mucho realizando nuestra encuesta de validación.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item (click)="goObjetos()" button>
+      <ion-avatar slot="start">
+        <ion-icon color="primary" class="iconobject" name="cart"></ion-icon>
+      </ion-avatar>
+      <ion-label>
+        <h2>Objetos relacionados</h2>
+        <p class="desc">Aquí puedes encontrar objetos relacionados para cámaras y mejorar tu calidad fotográfica.</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

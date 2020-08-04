@@ -1,0 +1,75 @@
+<ion-header >
+
+  <ion-toolbar>
+    <ion-title class="titulo">Editar perfil</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content padding class="contenido">
+
+  <!-- Foto de perfil-->
+
+  <div text-center>
+    <img class="edit-avatar" [src]="user?.photoURL" alt="">
+    <!-- <p class="change-text">Change Photo</p> -->
+    <!-- <div>
+      <ion-button fill="outline">
+        <ion-icon name="camera"></ion-icon>
+      </ion-button>
+    </div> -->
+  </div>
+  <div margin-top padding>
+    <h4 no-margin no-padding class="info-text">Información pública</h4>
+    <hr>
+  </div>
+  <div>
+    <form class="form-bottom-padding" [formGroup]="form" *ngIf="formReady">
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Nombre de usuario</ion-label>
+        <ion-input placeholder="Puedes ponerte el nombre que quieras ;)" formControlName="username"></ion-input>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Bio</ion-label>
+        <ion-textarea placeholder="Cuenta sobre tu trabajo es tu bio ;)" formControlName="bio"></ion-textarea>
+      </ion-item>
+      <ion-item text-wrap class="disabled">
+        <ion-label color="primary" position="stacked">E-mail</ion-label>
+        <h5>{{user?.email}}</h5>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Celular</ion-label>
+        <ion-input placeholder="Ingresa tu celu" formControlName="cellphone"></ion-input >
+      </ion-item>
+    </form>
+  </div>
+
+  <div class="btn-cerrar-sesion" text-center>
+    <ion-button color="danger" (click)="logOut()">
+      Cerrar sesión
+    </ion-button>
+  </div>
+
+</ion-content>
+<ion-fab  (click)="updateProfile()" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button [disabled]="!form?.valid">
+    <ion-icon name="save"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+<!-- <ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Perfil
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+ <ion-content>
+    <ion-button class="log-in-button" color="danger" expand="block" (click)="logOut()">
+      LOGOUT
+    </ion-button>
+  </ion-content> -->

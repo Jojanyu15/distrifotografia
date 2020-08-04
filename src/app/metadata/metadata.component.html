@@ -1,0 +1,96 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="metadataEdit">Editar metadatos</ion-title>
+    <ion-title *ngIf="!metadataEdit">Metadatos de la fotografía</ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content padding>
+  <div>
+    <form [formGroup]="form" ng-readonly *ngIf="formReady" class="form-bottom-padding formD">
+
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Artista</ion-label>
+        <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="artista"></ion-input>
+      </ion-item>
+
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Categoría</ion-label>
+        <ion-select interface="popover" *ngIf="metadataEdit" placeholder="" formControlName="categoria">
+          <ion-select-option *ngFor="let categoria of categorias" value="{{categoria.value}}">{{categoria.key}}
+          </ion-select-option>
+        </ion-select>
+        <ion-input *ngIf="!metadataEdit" [readonly]="!metadataEdit" placeholder="" formControlName="categoria">
+        </ion-input>
+      </ion-item>
+
+      <ion-item text-wrap>
+        <ion-label color="primary" position="stacked">Flash</ion-label>
+        <ion-input *ngIf="!metadataEdit" [readonly]="!metadataEdit" placeholder="" formControlName="flash"></ion-input>
+        <ion-select interface="popover" *ngIf="metadataEdit" formControlName="flash" value="No" okText="Ok" cancelText="Cancelar">
+          <ion-select-option value="Si">Si</ion-select-option>
+          <ion-select-option value="No">No</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('descripcion').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Descripción</ion-label>
+        <ion-input maxlength="240" [readonly]="!metadataEdit" placeholder="" formControlName="descripcion"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('fecha').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Fecha</ion-label>
+        <ion-input  [readonly]="!metadataEdit" type="date" formControlName="fecha"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('apreturaDiafragma').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Apretura de diafragma</ion-label>
+        <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="apreturaDiafragma">
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('balanceBlancos').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Balance de blancos</ion-label>
+        <ion-input  maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="balanceBlancos"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('distanciaFocal').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Distancia focal</ion-label>
+        <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="distanciaFocal"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('iso').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Iso</ion-label>
+        <ion-input  maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="iso"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('nivelExp').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Nivel de exposición</ion-label>
+        <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="nivelExp"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('resolucion').valid " text-wrap>
+        <ion-label color="primary" position="stacked">Resolución</ion-label>
+        <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="resolucion"></ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="form.get('tmpDeObturacion').valid" text-wrap>
+        <ion-label color="primary" position="stacked">Tiempo de obturación</ion-label>
+        <ion-input  maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="tmpDeObturacion"></ion-input>
+      </ion-item>
+
+    </form>
+  </div>
+</ion-content>
+<ion-fab *ngIf="metadataEdit" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="uploadFiles()"  [disabled]="!form?.valid">
+    <ion-icon name="save"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

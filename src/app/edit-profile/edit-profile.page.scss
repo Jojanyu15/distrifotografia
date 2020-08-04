@@ -1,0 +1,37 @@
+    .edit-avatar {
+      width: 150px;
+      text-align: center;
+      position: relative;
+      left: 0;
+      right: 0;
+      margin: auto;
+      padding-bottom: 10px;
+      border-radius: 100%;
+    }
+  
+    .change-text {
+      font-size: 13px;
+      color: #659CF2;
+    }
+
+    .btn-cerrar-sesion{
+        padding-top: 10px;;
+        text-align: center;
+    }
+  
+  
+    .form-bottom-padding {
+      padding-bottom: 60px;
+    }
+    .custom-hr {
+      height: 3px;
+    }
+  
+    .custom-select {
+      margin-left: 15px;
+      position: absolute;
+    }
+    .ion-input[disabled] {
+      opacity: var(--opacity, .4);
+    }
+     

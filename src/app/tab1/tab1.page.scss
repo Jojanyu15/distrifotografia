@@ -1,0 +1,29 @@
+.welcome-card img {
+  max-height: 35vh;
+  overflow: hidden;
+}
+.escudo{
+  width: 2.5rem;
+}
+
+ion-toolbar{
+  .title{
+    padding-top: 10px;
+    padding-right: 40px;
+    width: 15rem;
+  }
+}
+.rojo{
+  color:red !important;
+}
+.caja-vacia{
+  color:#C7C7C7;
+   padding-top: 5%;
+}
+.caja-vacia p{
+  font-size: 30px;
+}
+.icono-grande{
+  font-size: 200px;
+}
+

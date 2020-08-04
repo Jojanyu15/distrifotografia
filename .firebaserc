@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "distrifotografia"
+  },
+  "targets": {
+    "distrifotografiapp": {
+      "hosting": {
+        "distrifotografia": [
+          "distrifotografiapp"
+        ]
+      }
+    }
+  }
+}

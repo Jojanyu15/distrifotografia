@@ -1,0 +1,41 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Comentarios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">CERRAR</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen>
+  
+  <ion-grid *ngIf="comentarios.length==0">
+    <ion-row>
+      <ion-col text-center class="caja-vacia">
+        <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
+        <p>No hay ningún comentario por ahora, ¡Realiza uno!</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-list>
+    <ion-item *ngFor="let coment of comentarios">
+      <ion-avatar slot="start">
+        <img class="iconobject" [src]="coment?.photoURl">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{coment?.username}}</h2>
+        <p class="comment">{{coment?.comment}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+<br>
+<ion-footer>
+  <ion-item>
+    <ion-input [(ngModel)]="comment" maxlength="125" placeholder="¡Escribe un comentario para mejorar la experiencia!">
+    </ion-input>
+    <ion-button (click)="enviarComent()" fill="clear">
+      <ion-icon class="sendB" item-end slot="end" name="paper-plane"></ion-icon>
+    </ion-button>
+  </ion-item>
+</ion-footer>
