@@ -5,21 +5,22 @@
       <ion-icon name="home"></ion-icon>
       <ion-label>Inicio</ion-label>
     </ion-tab-button>
-
+    
     <ion-tab-button (click)="abrirFoto($event)">
-      <input (change)="cambiarPWAFOTO($event)"  hidden type="file" name="camera" id="pwa" id="pwaphoto"
-        #pwaphoto accept="image/x-png,image/jpeg">
+      <input (change)="cambiarPWAFOTO($event)" hidden type="file" name="camera" id="pwa" id="pwaphoto" #pwaphoto
+        accept="image/x-png,image/jpeg">
+        
       <ion-icon name="camera"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button (click)="showRModal()"  >
+    <ion-tab-button (click)="showRModal()">
       <ion-icon name="book"></ion-icon>
-            <ion-label>Recursos</ion-label>
+      <ion-label>Recursos</ion-label>
     </ion-tab-button>
     <ion-tab-button tab="profile">
       <ion-icon name="person"></ion-icon>
       <ion-label>Perfil</ion-label>
     </ion-tab-button>
- 
-   
+    
+
   </ion-tab-bar>
 </ion-tabs>

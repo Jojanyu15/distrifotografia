@@ -41,6 +41,9 @@ export class ProfilePage {
     });
     return await modal.present();
   }
+  goHD(post: PhotoModel) {
+    window.location.href = post.urlPath;
+  }
   ngOnInit() {
     if (this.uid != undefined && this.uid != null) {
       this.ving = true;
@@ -49,7 +52,7 @@ export class ProfilePage {
           this.profile = data.payload.data() as ProfileModel;
         })
       this.pProvider.obtenerUsuario(this.uid)
-        .collection('photos')
+        .collection('photos',ref=> ref.orderBy('createdAt','desc'))
         .get()
         .subscribe(photosdata => {
           photosdata.docs.forEach(photo => {
@@ -65,7 +68,8 @@ export class ProfilePage {
         subscribe(data => {
           this.profile = data.payload.data() as ProfileModel;
         })
-      this.pProvider.obtenerUsuario(this.authSvc.getCurrentUser().uid).collection('photos')
+      this.pProvider.obtenerUsuario(this.authSvc.getCurrentUser().uid)
+      .collection('photos',ref=> ref.orderBy('createdAt','desc'))
         .snapshotChanges()
         .subscribe(documentos => {
           this.images=[];

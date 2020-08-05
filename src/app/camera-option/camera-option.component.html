@@ -6,13 +6,15 @@
 
 <ion-content>
   <ion-grid padding>
-    <ion-row>
-      <ion-col size="12" *ngFor="let image of imgURI">
-        <img [src]="image">
-      </ion-col>
+    <ion-row text-center> 
+      <image-cropper [imageChangedEvent]="imageChangedEvent"  [maintainAspectRatio]="true" [aspectRatio]="4 / 3"
+        format="png" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()"
+        (loadImageFailed)="loadImageFailed()"></image-cropper>
+        <!-- <img [src]="croppedImage"> -->
     </ion-row>
   </ion-grid>
 </ion-content>
+
 
 <ion-fab (click)="editarMetadatos()" vertical="bottom" horizontal="end" slot="fixed">
   <ion-fab-button>

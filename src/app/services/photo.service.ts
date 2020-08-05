@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Injectable, ViewChild, ElementRef } from '@angular/core';
+import { Injectable, ViewChild, ElementRef, ComponentFactoryResolver, SecurityContext } from '@angular/core';
 import * as firebase from 'firebase';
 import { DatePipe } from '@angular/common';
 import { PhotoModel } from '../models/photo.model';
@@ -10,8 +10,13 @@ import { AuthServiceService } from './auth-service.service';
 import { Timestamp } from 'rxjs/internal/operators/timestamp';
 import { LoadViewCtrl } from '../utils/load-view-ctrl';
 import { PhotoProvider } from '../providers/photo.provider';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { async } from '@angular/core/testing';
+import { NgxImageCompressService } from 'ngx-image-compress';
+import { url } from 'inspector';
+import { UploadTaskSnapshot } from '@angular/fire/storage/interfaces';
+import { takeLast, timeout } from 'rxjs/operators';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -19,13 +24,19 @@ import { async } from '@angular/core/testing';
 export class PhotoService {
 
   private fotografia: PhotoModel;
+  loading: any;
+  private percentaje;
+  private htmlValue;
   constructor(private storage: AngularFireStorage,
     private http: HttpClient,
     private pProvider: ProfileProvider,
     private authSvc: AuthServiceService,
     public afs: AngularFirestore,
     public lVC: LoadViewCtrl,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private compresser: NgxImageCompressService,
+    private loadCtrl: LoadingController,
+    private sanitizer: DomSanitizer
   ) { }
 
   public uploadFile(
@@ -39,15 +50,41 @@ export class PhotoService {
 
   public uploadComment() {
   }
+
+  public test() {
+    let imgResultBeforeCompress: string;
+    let imgResultAfterCompress: string;
+
+    this.compresser.uploadFile().then(({ image, orientation }) => {
+
+      imgResultBeforeCompress = image;
+      console.warn('Size in bytes was:', this.compresser.byteCount(image));
+
+      this.compresser.compressFile(image, orientation, 50, 50).then(
+        result => {
+          imgResultAfterCompress = result;
+          console.warn('Size in bytes is now:', this.compresser.byteCount(result));
+        }
+      );
+
+    });
+  }
+
+
   public uploadPhoto(
-    file: any,
-    customMetadata: PhotoModel): Promise<void> {
-    this.lVC.actionExecution();
+    photo: any, photocropped: any,
+    customMetadata: PhotoModel
+  ): Promise<void> {
+    this.lVC.actionExecution("Cargando fotografía en calidad normal");
     return new Promise<void>((resolve, reject) => {
+
       let filename = Math.floor(Date.now() / 1000).toString();
-      filename = '/fotos/' + filename + '.jpg';
-      let ref = this.storage.ref(filename);
-      customMetadata.urlPath = filename;
+      let fileOG = '/fotos/' + filename + '.jpg';
+      let filecropped = '/fotos/' + filename + 'c' + '.jpg';
+      let ref = this.storage.ref(fileOG);
+      let refCropped = this.storage.ref(filecropped);
+      customMetadata.urlPath = fileOG;
+      customMetadata.pathCropped = filecropped;
       customMetadata.creador = this.authSvc.getCurrentUser().displayName;
       customMetadata.photoCreador = this.authSvc.getCurrentUser().photoURL;
       customMetadata.userUid = this.authSvc.getCurrentUser().uid
@@ -56,28 +93,76 @@ export class PhotoService {
       let uid = this.authSvc.getCurrentUser().uid;
       this.fotografia.createdAt = timest;
 
-      //subo primero el archivo
-      ref.put(file).then((fileRef) => {
-        fileRef.ref.getDownloadURL().then(url => {
-          this.fotografia.urlPath = url;
-          //Añadimos primero la fotografía a la carpeta del usuario
-          this.pProvider.obtenerUsuario(uid).collection('photos').add(this.fotografia).then(docNuevo => {
-            //Añadimos el documento a la lista global
-            this.afs.collection('urlPaths').doc(docNuevo.id).set(this.fotografia);
-          });
-        });
 
-      }).then(() => {
-        this.lVC.endExecution();
-      });
-      //actualizo el documento con su dirección 
+      this.compresser.compressFile(photocropped, 'vertical', 20, 5)
+        .then((photoCompressed => {
+
+          fetch(photoCompressed)
+            .then(res => {
+              res.blob().then((blobg) => {
+                //PRIMERO SUBE LA FOTOGRAFÍA DE BAJO TAMAÑO
+                refCropped.put(blobg).then((croppedRef) => {
+                  this.getDownloadURL(this.fotografia.pathCropped).then(path => {
+                    //UNA VEZ SUBIDA LA FOTOGRAFÍA SE OBTIENE LA URL DE DESCARGA Y SE ACTUALIZA
+                    //EN  EL DOCUMENTO
+                    this.fotografia.pathCropped = path;
+                    this.pProvider.obtenerUsuario(uid).collection('photos').add(this.fotografia).then(docNuevo => {
+                      this.afs.collection('urlPaths').doc(docNuevo.id).set(this.fotografia);
+                      this.fotografia.docId = docNuevo.id;
+                      this.lVC.endExecution();
+                    }).then(() => {
+                      //DESPUES SUBE LA FOTOGRAFÍA ORIGINAL
+                      const task = this.storage.upload(fileOG, photo);
+                      this.cargarFotogrfiaHD(task);
+                    });;
+                  })
+                })
+
+              });
+            });
+        }));
+
       resolve();
     });
-
-
-    //  this.pProvider.obtenerUsuario();
   }
 
+
+
+  async cargarFotogrfiaHD(task: AngularFireUploadTask) {
+    const load = await this.loadCtrl.create({
+      cssClass: '',
+    });
+    
+    load.present();
+    task.percentageChanges().subscribe(async number => {
+      load.setAttribute('message', 'Cargando fotografía en alta calidad,'+ 
+      'por favor espera...\n'
+        + 'progreso: '+number.toFixed()+'%');
+      if((await task).state=="success"){
+        await load.dismiss();
+      }
+    });
+    
+    await load.onDidDismiss().then(()=>{
+      this.aPhotoUploaded();
+    });
+  }
+ 
+  private aPhotoUploaded() {
+    let uid = this.authSvc.getCurrentUser().uid;
+      this.getDownloadURL(this.fotografia.urlPath).then(path => {
+        //UNA VEZ SUBIDA LA FOTOGRAFÍA SE OBTIENE LA URL DE DESCARGA Y SE ACTUALIZA
+        //EN  EL DOCUMENTO
+        this.pProvider.obtenerUsuario(uid).collection('photos').doc(this.fotografia.docId)
+          .update({
+            'urlPath': path
+          }).then(docNuevo => {
+            this.afs.collection('urlPaths').doc(this.fotografia.docId).update({
+              'urlPath': path
+            });
+          });
+      });
+  }
   private generateAlert(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.alertController
@@ -110,8 +195,8 @@ export class PhotoService {
               this.afs.collection('urlPaths').doc(photo.docId).delete();
             });
         }
-      }).catch(err=>{
-        
+      }).catch(err => {
+
       });
     }
   }

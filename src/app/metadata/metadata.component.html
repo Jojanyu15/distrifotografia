@@ -18,11 +18,13 @@
 
       <ion-item text-wrap>
         <ion-label color="primary" position="stacked">Artista</ion-label>
+        <ion-label *ngIf="metadataEdit" color="danger" position="stacked">*Requerido</ion-label>
         <ion-input maxlength="30" [readonly]="!metadataEdit" placeholder="" formControlName="artista"></ion-input>
       </ion-item>
 
       <ion-item text-wrap>
         <ion-label color="primary" position="stacked">Categoría</ion-label>
+        <ion-label *ngIf="metadataEdit" color="danger" position="stacked">*Requerido</ion-label>
         <ion-select interface="popover" *ngIf="metadataEdit" placeholder="" formControlName="categoria">
           <ion-select-option *ngFor="let categoria of categorias" value="{{categoria.value}}">{{categoria.key}}
           </ion-select-option>
@@ -33,6 +35,7 @@
 
       <ion-item text-wrap>
         <ion-label color="primary" position="stacked">Flash</ion-label>
+        <ion-label *ngIf="metadataEdit" color="danger" position="stacked">*Requerido</ion-label>
         <ion-input *ngIf="!metadataEdit" [readonly]="!metadataEdit" placeholder="" formControlName="flash"></ion-input>
         <ion-select interface="popover" *ngIf="metadataEdit" formControlName="flash" value="No" okText="Ok" cancelText="Cancelar">
           <ion-select-option value="Si">Si</ion-select-option>

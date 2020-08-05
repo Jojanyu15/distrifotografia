@@ -43,25 +43,28 @@
           <ion-icon name="options"></ion-icon>
         </ion-button>
       </ion-item>
-      <ion-card-content>
-        <img [src]="post?.urlPath">
+      <ion-card-content style="padding: 0;">
+        <img [src]="post?.pathCropped">
       </ion-card-content>
       <div>
         <ion-segment>
-          <ion-segment-button (click)="goHD(post)">
-            <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+          <ion-segment-button [disabled]="post?.urlPath.length<50" (click)="goHD(post)">
+            <ion-icon  src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+            <ion-label class="fontz">Ver en HD</ion-label>
           </ion-segment-button>
           <ion-segment-button (click)="verComentarios(post)">
             <ion-icon name="text"></ion-icon>
+            <ion-label class="fontz">Comentarios</ion-label>
           </ion-segment-button>
           <ion-segment-button (click)="goMetadata(post)">
             <ion-icon name="information-circle-outline"></ion-icon>
+            <ion-label class="fontz">Metadatos</ion-label>
           </ion-segment-button>
         </ion-segment>
       </div>
     </ion-card>
     
-    <ion-card *ngIf="scateg==''">
+    <ion-card *ngIf="scateg==''" >
       <ion-item >
         <ion-avatar (click)="goProfile(post.userUid)" slot="start">
           <img [src]="post?.photoCreador">
@@ -71,19 +74,22 @@
           <ion-icon name="options"></ion-icon>
         </ion-button>
       </ion-item>
-      <ion-card-content>
-        <img [src]="post?.urlPath">
+      <ion-card-content style="padding: 0;">
+        <img [src]="post?.pathCropped">
       </ion-card-content>
       <div>
         <ion-segment>
-          <ion-segment-button (click)="goHD(post)">
+          <ion-segment-button [disabled]="post?.urlPath.length<50" (click)="goHD(post)">
             <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+            <ion-label class="fontz">Ver en HD</ion-label>
           </ion-segment-button>
           <ion-segment-button (click)="verComentarios(post)">
             <ion-icon name="text"></ion-icon>
+            <ion-label class="fontz">Comentarios</ion-label>
           </ion-segment-button>
           <ion-segment-button (click)="goMetadata(post)">
             <ion-icon name="information-circle-outline"></ion-icon>
+            <ion-label class="fontz">Metadatos</ion-label>
           </ion-segment-button>
         </ion-segment>
       </div>

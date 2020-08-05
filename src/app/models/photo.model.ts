@@ -2,6 +2,7 @@ import { Timestamp } from 'rxjs/internal/operators/timestamp';
 
 export class PhotoModel {
     urlPath: string;
+    pathCropped: string;
     fecha: any;
     descripcion: string;
     artista: string;

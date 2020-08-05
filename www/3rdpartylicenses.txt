@@ -383,6 +383,8 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 
 ionic-loader
 
+ngx-image-compress
+
 ngx-image-cropper
 MIT
 MIT License

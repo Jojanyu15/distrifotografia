@@ -24,11 +24,16 @@ export class LoadViewCtrl {
         this.processing = false;
     }
 
-    public actionExecution() {
+    public actionExecution(msg?) {
+        let message="";
+        if(msg!=null && msg!=undefined){
+            message=msg;
+        }else{
+            message="Cargando";
+        }
         if (!this.processing) {
             this.loadingController.create({
-                message: 'Cargando',
-                spinner: 'bubbles'
+                message: message,
             }).then(value => {
                 value.present();
                 this.processing = true;
@@ -44,6 +49,8 @@ export class LoadViewCtrl {
 
             });
         }
+        
+        
 
     }
 

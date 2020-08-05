@@ -7,6 +7,7 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { KeyValue } from '@angular/common';
 import { Router } from '@angular/router';
 import { LoadViewCtrl } from '../utils/load-view-ctrl';
+import {NgxImageCompressService} from 'ngx-image-compress';
 
 @Component({
   selector: 'app-metadata',
@@ -19,7 +20,8 @@ export class MetadataComponent {
   formReady: boolean;
   multipleFotos: boolean;
   form: FormGroup;
-  filelist: FileList;
+  photoFile: any;
+  croppedImage: any;
   metadata: PhotoModel;
   public categorias: KeyValue<string, string>[] = [];
 
@@ -32,11 +34,12 @@ export class MetadataComponent {
     private photoSvc: PhotoService,
     private navCtrl: NavController,
     private router: Router,
-    private loading: LoadViewCtrl) {
+    private loading: LoadViewCtrl,
+    private compresser:NgxImageCompressService
+    ) {
     this.formReady = false;
-    this.filelist = this.navParams.get('fileList');
-    this.multipleFotos = this.navParams.get('multipleFotos');
-
+    this.photoFile = this.navParams.get('photoFile');
+    this.croppedImage = this.navParams.get('croppedImage');
   }
 
   ngOnInit() {
@@ -54,7 +57,6 @@ export class MetadataComponent {
         nivelExp: [this.pMetadata.nivelExp,Validators.required],
         resolucion: [this.pMetadata.resolucion,Validators.required],
         tmpDeObturacion: [this.pMetadata.tmpDeObturacion,Validators.required],
-        // urlPath: ['', [Validators.required, Validators.maxLength(30)]],
         categoria: [this.pMetadata.categoria],
       });
 
@@ -73,19 +75,9 @@ export class MetadataComponent {
           nivelExp: ['', [Validators.maxLength(30)]],
           resolucion: ['', [Validators.maxLength(240)]],
           tmpDeObturacion: ['', [Validators.maxLength(30)]],
-          // urlPath: ['', [Validators.required, Validators.maxLength(30)]],
           categoria: ['', [Validators.required, Validators.maxLength(30)]],
         });
       }
-      /*   else {
-           console.log("entrotrón multiple");
-           this.form = this.formBuilder.group({
-             artista: ['', [Validators.required, Validators.maxLength(240)]],
-             fecha: ['', [Validators.required, Validators.maxLength(30)]],
-             descripcion: ['', [Validators.required, Validators.maxLength(30)]],
-             categoria: ['', [Validators.required, Validators.maxLength(30)]]
-           });
-         }*/
     }
     this.categorias = this.dataService.loadCategorias();
     this.formReady = true;
@@ -121,7 +113,7 @@ export class MetadataComponent {
     /*  for (let i = 0; i < this.filelist.length; i++) {
         this.photoSvc.uploadPhoto(this.filelist.item(0),currentMetadata);
       }*/
-    this.photoSvc.uploadPhoto(this.filelist.item(0), currentMetadata).then(a => {
+    this.photoSvc.uploadPhoto(this.photoFile,this.croppedImage, currentMetadata).then(a => {
       this.modalController.dismiss();
     });
 

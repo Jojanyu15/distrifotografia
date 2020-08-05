@@ -9,6 +9,8 @@ import { Component, Input, ElementRef, ViewChild, Output, EventEmitter } from '@
 import { Observable } from 'rxjs';
 import { ModalController } from '@ionic/angular';
 import { ModalresourcesComponent } from '../modalresources/modalresources.component';
+import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { analytics } from 'firebase';
 
 
 @Component({
@@ -20,9 +22,11 @@ export class TabsPage {
   imgURI: string = null;
   @ViewChild('pwaphoto', { static: false }) pwaphoto: ElementRef;
   date = new Date();
-  // firebaseFileTask: AngularFireUploadTask;
   progress: number = 10;
   isOnProgress: boolean = false;
+  fileEvent:any;
+
+
   constructor(public authSvc: AuthServiceService,
     public modalCtrl: ModalController,
     private pipe: DatePipe,
@@ -32,31 +36,34 @@ export class TabsPage {
 
   ) {
   }
-  public async showRModal(){
-    
-      const modal = await this.modalController.create({
-        component: ModalresourcesComponent,
-        // cssClass: 'my-custom-class'
-      });
-      return await modal.present();
+
+
+
+  public async showRModal() {
+
+    const modal = await this.modalController.create({
+      component: ModalresourcesComponent,
+      // cssClass: 'my-custom-class'
+    });
+    return await modal.present();
   }
   abrirFoto(event) {
     if (this.pwaphoto == null) {
       return;
     }
-
+    this.fileEvent=event;
     this.pwaphoto.nativeElement.click();
   }
 
-  async presentModal(filearray: any[], fileList:FileList,lenght:number) {
+  async presentModal(file: any,fileEvent:any,uri:any) {
     const modal = await this.modalController.create({
       component: CameraOptionComponent,
       componentProps: {
-        'fileArray': filearray,
-        'fileList': fileList,
-        'lenght':lenght
+        'photoFile': file,
+        'fileEvent':fileEvent,
+        'fileURI':uri
       },
-      id:'viewModal'
+      id: 'viewModal'
 
     });
     return await modal.present();
@@ -64,27 +71,21 @@ export class TabsPage {
 
   cambiarPWAFOTO(event) {
     //arreglo con los archivos que contienen las fotografías
-    let fileArray = [];
+    this.fileEvent=event;
+    let photoFile: any = this.pwaphoto.nativeElement.files[0];
+    console.log(photoFile);
     if (this.pwaphoto == null) {
       return;
     }
     //listado de fotografias selaccionadas 
-    const fileList: FileList = this.pwaphoto.nativeElement.files;
+    this.presentModal(photoFile,this.fileEvent,event.base64);
 
-    if (fileList && fileList.length > 0) {
-      for (let i = 0; i < fileList.length; i++) {
-        this.archivoABase64(fileList.item(i)).then((resulta: string) => {
-          //introduce dentro del arreglo los archivos uno por uno
-          fileArray.push(resulta);
-        });
-      }
-      //muestra la pagina enviandole el arreglo de archivos para que los visualice
-      this.presentModal(fileArray,fileList,fileList.length);
-    }
-    //  this.photoSvc.uploadFile(fileList.item(0).name,fileList.item(0));
-    const filename = Math.floor(Date.now() / 1000).toString();
+    // this.archivoABase64(photoFile).then((resulta: string) => {
+    // });
+    // const filename = Math.floor(Date.now() / 1000).toString();
   }
-//convierte el archivo que se trajo a base64
+
+  //convierte el archivo que se trajo a base64
   private archivoABase64(fileImage: File): Promise<{}> {
     return new Promise((resolve, reject) => {
       let fileReader: FileReader = new FileReader();

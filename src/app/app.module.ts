@@ -30,6 +30,8 @@ import { ModalresourcesComponent } from './modalresources/modalresources.compone
 import { ProfilePage } from './profile/profile.page';
 import { ProfilePageModule } from './profile/profile.module';
 import { ModalcomentComponent } from './modalcoment/modalcoment.component';
+import {NgxImageCompressService} from 'ngx-image-compress';
+import { ByPassSecurityPipe } from './pipes/by-pass-security.pipe';
 
 const SERVICES = [
   AuthServiceService,
@@ -42,7 +44,8 @@ const SERVICES = [
 const PROVIDERS = [
   ProfileProvider,
   LoadViewCtrl,
-  DatePipe
+  DatePipe,
+  NgxImageCompressService
 ];
 
 const IMPORTS = [
@@ -61,7 +64,7 @@ const IMPORTS = [
 
 
 @NgModule({
-  declarations: [AppComponent,CameraOptionComponent,MetadataComponent,ModalresourcesComponent,ModalcomentComponent],
+  declarations: [AppComponent,CameraOptionComponent,MetadataComponent,ModalresourcesComponent,ModalcomentComponent, ByPassSecurityPipe],
   entryComponents: [CameraOptionComponent,MetadataComponent,ModalresourcesComponent,ProfilePage,ModalcomentComponent],
   imports: [BrowserModule, 
     IonicModule.forRoot(), 
