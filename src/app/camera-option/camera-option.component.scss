@@ -5,3 +5,14 @@
     margin-top: 1%;
     padding-bottom: 10px;
 }
+.imagepreview{
+    object-fit: cover;
+    img{
+        image-rendering: pixelated; 
+        object-fit: cover;
+    }
+    .img{
+        image-rendering: pixelated; 
+        object-fit: cover;
+    }
+}

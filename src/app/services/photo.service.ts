@@ -13,7 +13,7 @@ import { PhotoProvider } from '../providers/photo.provider';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { async } from '@angular/core/testing';
 import { NgxImageCompressService } from 'ngx-image-compress';
-import { url } from 'inspector';
+
 import { UploadTaskSnapshot } from '@angular/fire/storage/interfaces';
 import { takeLast, timeout } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';

@@ -11,7 +11,8 @@ import { ModalController } from '@ionic/angular';
 import { ModalresourcesComponent } from '../modalresources/modalresources.component';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { analytics } from 'firebase';
-
+import * as exif from 'exif-js';
+import { LoadViewCtrl } from '../utils/load-view-ctrl';
 
 @Component({
   selector: 'app-tabs',
@@ -24,7 +25,7 @@ export class TabsPage {
   date = new Date();
   progress: number = 10;
   isOnProgress: boolean = false;
-  fileEvent:any;
+  fileEvent: any;
 
 
   constructor(public authSvc: AuthServiceService,
@@ -32,7 +33,8 @@ export class TabsPage {
     private pipe: DatePipe,
     private afs: AngularFirestore,
     private photoSvc: PhotoService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private loadvie: LoadViewCtrl
 
   ) {
   }
@@ -47,42 +49,41 @@ export class TabsPage {
     });
     return await modal.present();
   }
-  abrirFoto(event) {
-    if (this.pwaphoto == null) {
-      return;
-    }
-    this.fileEvent=event;
-    this.pwaphoto.nativeElement.click();
-  }
 
-  async presentModal(file: any,fileEvent:any,uri:any) {
+
+  async presentModal(file: any, fileEvent: any, uri: any) {
+
     const modal = await this.modalController.create({
       component: CameraOptionComponent,
       componentProps: {
         'photoFile': file,
-        'fileEvent':fileEvent,
-        'fileURI':uri
+        'fileEvent': fileEvent,
+        'fileURI': uri
       },
       id: 'viewModal'
 
     });
-    return await modal.present();
+    return await modal.present().then(() => {
+    }
+    );
   }
-
-  cambiarPWAFOTO(event) {
-    //arreglo con los archivos que contienen las fotografías
-    this.fileEvent=event;
-    let photoFile: any = this.pwaphoto.nativeElement.files[0];
-    console.log(photoFile);
+  abrirFoto(event) {
     if (this.pwaphoto == null) {
       return;
     }
-    //listado de fotografias selaccionadas 
-    this.presentModal(photoFile,this.fileEvent,event.base64);
+    console.log(event);
+    this.fileEvent = event;
+    this.pwaphoto.nativeElement.click();
+  }
 
-    // this.archivoABase64(photoFile).then((resulta: string) => {
-    // });
-    // const filename = Math.floor(Date.now() / 1000).toString();
+  cambiarPWAFOTO(event) {
+    this.fileEvent = event;
+    let photoFile: any = this.pwaphoto.nativeElement.files[0];
+
+    if (this.pwaphoto == null) {
+      return;
+    }
+    this.presentModal(photoFile, this.fileEvent, event);
   }
 
   //convierte el archivo que se trajo a base64

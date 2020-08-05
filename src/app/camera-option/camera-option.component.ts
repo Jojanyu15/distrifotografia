@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavParams, AlertController, PopoverController, ModalController, NavController } from '@ionic/angular';
 import { LoadViewCtrl } from '../utils/load-view-ctrl';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
+import { NgxImageCompressService } from 'ngx-image-compress';
 
 
 @Component({
@@ -12,28 +13,33 @@ import { ImageCroppedEvent } from 'ngx-image-cropper';
   styleUrls: ['./camera-option.component.scss'],
 })
 export class CameraOptionComponent implements OnInit {
-  imgURI: any ;
-  photoFile:any;
-  fileEvent:any
+  imgURI: any;
+  photoFile: any;
+  fileEvent: any
   // multipleFotos: boolean;
   imageChangedEvent: any = '';
   croppedImage: any = '';
-  imageFile:any;
+  imageFile: any;
+  compressed: any;
   constructor(private navParams: NavParams,
     private photoSvc: PhotoService,
     private alertController: AlertController,
     private loadCtrl: LoadViewCtrl,
     private modalCtrl: ModalController,
-    private nav: NavController) {
+    private nav: NavController,
+    private compresser: NgxImageCompressService
+
+  ) {
 
     this.photoFile = this.navParams.get('photoFile');
     this.fileEvent = this.navParams.get('fileEvent');
-    this.imgURI=this.navParams.get('fileURI');
+    this.imgURI = this.navParams.get('fileURI');
   }
-
-  ngOnInit(){
-    // this.fileChangeEvent(this.navParams.get('photoFile'));
-      this.imageChangedEvent = this.navParams.get('fileEvent');
+  goBack() {
+    this.modalCtrl.dismiss();
+  }
+  ngOnInit() {
+    this.imageChangedEvent = this.navParams.get('fileEvent');
   }
   fileChangeEvent(event: any): void {
     console.log(event);
@@ -53,8 +59,10 @@ export class CameraOptionComponent implements OnInit {
     // show message
   }
 
+  ionViewWillEnter(){
+  }
   async presentMetadataModal() {
-    
+
     const modal = await this.modalCtrl.create({
       component: MetadataComponent,
       componentProps: {
@@ -78,6 +86,6 @@ export class CameraOptionComponent implements OnInit {
     this.presentMetadataModal().then((x) => {
     })
   }
- 
+
 
 }
