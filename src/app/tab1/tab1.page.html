@@ -22,7 +22,7 @@
   </ion-item>
 
   <!-- <interface="action-sheet"*></interface> -->
-  <ion-grid *ngIf="posts.length==0">
+  <ion-grid *ngIf="posts?.length==0">
     <ion-row>
       <ion-col text-center class="caja-vacia">
         <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
@@ -39,17 +39,17 @@
           <img [src]="post?.photoCreador">
         </ion-avatar>
         <ion-label>{{post?.creador}} </ion-label>
-        <ion-button (click)="mostrarMenu(post)"  fill="clear">
+        <ion-button (click)="mostrarMenu(post)" fill="clear">
           <ion-icon name="options"></ion-icon>
         </ion-button>
       </ion-item>
       <ion-card-content style="padding: 0;">
-        <img [src]="post?.pathCropped">
+        <img [src]="post?.urlThumb">
       </ion-card-content>
       <div>
         <ion-segment>
-          <ion-segment-button [disabled]="post?.urlPath.length<50" (click)="goHD(post)">
-            <ion-icon  src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+          <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
+            <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
             <ion-label class="fontz">Ver en HD</ion-label>
           </ion-segment-button>
           <ion-segment-button (click)="verComentarios(post)">
@@ -63,9 +63,9 @@
         </ion-segment>
       </div>
     </ion-card>
-    
-    <ion-card *ngIf="scateg==''" >
-      <ion-item >
+
+    <ion-card *ngIf="scateg==''">
+      <ion-item>
         <ion-avatar (click)="goProfile(post.userUid)" slot="start">
           <img [src]="post?.photoCreador">
         </ion-avatar>
@@ -75,11 +75,11 @@
         </ion-button>
       </ion-item>
       <ion-card-content style="padding: 0;">
-        <img [src]="post?.pathCropped">
+        <img [src]="post?.urlThumb">
       </ion-card-content>
       <div>
         <ion-segment>
-          <ion-segment-button [disabled]="post?.urlPath.length<50" (click)="goHD(post)">
+          <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
             <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
             <ion-label class="fontz">Ver en HD</ion-label>
           </ion-segment-button>

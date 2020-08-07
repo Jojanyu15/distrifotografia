@@ -17,6 +17,7 @@ import {NgxImageCompressService} from 'ngx-image-compress';
 export class MetadataComponent {
   @Input() pMetadata: PhotoModel;
   @Input() metadataEdit: boolean = true;
+  @Input() filePath: string [];
   formReady: boolean;
   multipleFotos: boolean;
   form: FormGroup;
@@ -88,7 +89,7 @@ export class MetadataComponent {
   async presentAlertConfirm() {
     const alert = await this.alertController.create({
       header: 'Alerta!',
-      message: '¿Desea subir las fotos?',
+      message: '¿Desea subir la fotografía?',
       buttons: [
         {
           text: 'No',
@@ -98,9 +99,9 @@ export class MetadataComponent {
 
           }
         }, {
-          text: 'Okay',
+          text: 'Si',
           handler: () => {
-            this.uploadFiles();
+            this.uploadMetadata();
           }
         }
       ]
@@ -108,14 +109,19 @@ export class MetadataComponent {
 
     await alert.present();
   }
-  public uploadFiles() {
+
+  public uploadMetadata() {
+    this.loading.actionExecution('Subiendo la fotografía...');
     let currentMetadata: PhotoModel = this.form.value;
-    /*  for (let i = 0; i < this.filelist.length; i++) {
-        this.photoSvc.uploadPhoto(this.filelist.item(0),currentMetadata);
-      }*/
-    this.photoSvc.uploadPhoto(this.photoFile,this.croppedImage, currentMetadata).then(a => {
-      this.modalController.dismiss();
+    this.photoSvc.uploadMetadata(this.filePath,currentMetadata).then(response=>{
+      if(response){
+        this.modalController.dismiss();
+      }
     });
+    
+    // this.photoSvc.uploadPhoto(this.photoFile,this.croppedImage, currentMetadata).then(a => {
+    //   this.modalController.dismiss();
+    // });
 
   }
 }

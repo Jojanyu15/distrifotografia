@@ -48,7 +48,139 @@ export class PhotoService {
     return ref.put(file);
   }
 
-  public uploadComment() {
+  public uploadAndGetThumb(photo: any): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
+      let filename = Math.floor(Date.now() / 1000).toString();
+      let urls = [];
+      let fileOG = '/fotos/' + filename + '.jpg';
+      let fileThumb = '/fotos/thumb_' + filename + '.jpg';
+      urls.push(fileOG);
+      urls.push(fileThumb);
+      const task = this.storage.upload(fileOG, photo);
+      this.loadingScreen(task).then((uploaded) => {
+        if (uploaded) {
+          resolve(urls);
+        }
+      });
+
+    });
+  }
+
+  private updatePhotoPath(paths): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      let uid = this.authSvc.getCurrentUser().uid;
+      this.getDownloadURL(paths[0]).then(urlPath => {
+        console.log(urlPath);
+        this.getDownloadURL(paths[1]).then(urlThumb => {
+          console.log(urlThumb);
+          this.pProvider.obtenerUsuario(uid).collection('photos').doc(this.fotografia.docId)
+            .update({
+              'urlPath': urlPath,
+              'urlThumb': urlThumb
+            }).then(docNuevo => {
+              this.afs.collection('urlPaths').doc(this.fotografia.docId).update({
+                'urlPath': urlPath,
+                'urlThumb': urlThumb
+              }).then(() => {
+                this.lVC.endExecution();
+                resolve();
+                this.lVC.basicToast('Fotografía subida');
+              });
+            });
+        });
+      });
+    });
+  }
+
+  public uploadMetadata(fileURLs: string[], metadata: PhotoModel): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+
+      const timest = firebase.firestore.Timestamp.fromDate(new Date());
+      let uid = this.authSvc.getCurrentUser().uid;
+      this.fotografia = JSON.parse(JSON.stringify(metadata)) as PhotoModel;
+      this.fotografia.creador = this.authSvc.getCurrentUser().displayName;
+      this.fotografia.photoCreador = this.authSvc.getCurrentUser().photoURL;
+      this.fotografia.userUid = this.authSvc.getCurrentUser().uid;
+      this.fotografia.createdAt = timest;
+
+      this.pProvider.obtenerUsuario(uid).collection('photos').add(this.fotografia).then(docNuevo => {
+        this.afs.collection('urlPaths').doc(docNuevo.id).set(this.fotografia);
+        this.fotografia.docId = docNuevo.id;
+      }).then(() => {
+        this.updatePhotoPath(fileURLs).then(()=>{
+          resolve(true);
+        });
+      });
+    });
+  }
+
+
+
+  async loadingScreen(task: AngularFireUploadTask): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      const load = await this.loadCtrl.create({
+        cssClass: '',
+      });
+
+      load.present();
+      task.percentageChanges().subscribe(async number => {
+        load.setAttribute('message', 'Cargando fotografía en alta calidad,' +
+          'por favor espera...\n'
+          + 'progreso: ' + number.toFixed() + '%');
+        if ((await task).state == "success") {
+          resolve(true);
+          await load.dismiss();
+        }
+      });
+    });
+  }
+
+
+
+  public deletephoto(photo: PhotoModel) {
+    if (this.authSvc.getCurrentUser().uid == photo.userUid) {
+      this.generateAlert().then(opcion => {
+        if (opcion) {
+          this.pProvider.obtenerUsuario(photo.userUid).collection('photos').doc(photo.docId)
+            .delete().then(() => {
+              this.afs.collection('urlPaths').doc(photo.docId).delete();
+            });
+        }
+      }).catch(err => {
+
+      });
+    }
+  }
+  public getDownloadURL(path: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.storage.storage.ref(path).getDownloadURL().then(url => {
+        resolve(url);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+
+  }
+
+
+
+
+
+  /*---------------------------------------DEPRECATED CODE-----------------------------------*/
+  private aPhotoUploaded() {
+    let uid = this.authSvc.getCurrentUser().uid;
+    this.getDownloadURL(this.fotografia.urlPath).then(path => {
+      //UNA VEZ SUBIDA LA FOTOGRAFÍA SE OBTIENE LA URL DE DESCARGA Y SE ACTUALIZA
+      //EN  EL DOCUMENTO
+      this.pProvider.obtenerUsuario(uid).collection('photos').doc(this.fotografia.docId)
+        .update({
+          'urlPath': path
+        }).then(docNuevo => {
+          this.afs.collection('urlPaths').doc(this.fotografia.docId).update({
+            'urlPath': path
+          });
+        });
+    });
   }
 
   public test() {
@@ -132,37 +264,23 @@ export class PhotoService {
     const load = await this.loadCtrl.create({
       cssClass: '',
     });
-    
+
     load.present();
     task.percentageChanges().subscribe(async number => {
-      load.setAttribute('message', 'Cargando fotografía en alta calidad,'+ 
-      'por favor espera...\n'
-        + 'progreso: '+number.toFixed()+'%');
-      if((await task).state=="success"){
+      load.setAttribute('message', 'Cargando fotografía en alta calidad,' +
+        'por favor espera...\n'
+        + 'progreso: ' + number.toFixed() + '%');
+      if ((await task).state == "success") {
         await load.dismiss();
       }
     });
-    
-    await load.onDidDismiss().then(()=>{
+
+    await load.onDidDismiss().then(() => {
       this.aPhotoUploaded();
     });
   }
- 
-  private aPhotoUploaded() {
-    let uid = this.authSvc.getCurrentUser().uid;
-      this.getDownloadURL(this.fotografia.urlPath).then(path => {
-        //UNA VEZ SUBIDA LA FOTOGRAFÍA SE OBTIENE LA URL DE DESCARGA Y SE ACTUALIZA
-        //EN  EL DOCUMENTO
-        this.pProvider.obtenerUsuario(uid).collection('photos').doc(this.fotografia.docId)
-          .update({
-            'urlPath': path
-          }).then(docNuevo => {
-            this.afs.collection('urlPaths').doc(this.fotografia.docId).update({
-              'urlPath': path
-            });
-          });
-      });
-  }
+
+
   private generateAlert(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.alertController
@@ -186,30 +304,7 @@ export class PhotoService {
     });
   }
 
-  public deletephoto(photo: PhotoModel) {
-    if (this.authSvc.getCurrentUser().uid == photo.userUid) {
-      this.generateAlert().then(opcion => {
-        if (opcion) {
-          this.pProvider.obtenerUsuario(photo.userUid).collection('photos').doc(photo.docId)
-            .delete().then(() => {
-              this.afs.collection('urlPaths').doc(photo.docId).delete();
-            });
-        }
-      }).catch(err => {
 
-      });
-    }
-  }
-  public getDownloadURL(path: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      this.storage.storage.ref(path).getDownloadURL().then(url => {
-        resolve(url);
-      }).catch(err => {
-        reject(err);
-      });
-    });
-
-  }
 
   public readBlobFromURL(fileUrl: string): Promise<Blob> {
     return this.http.get(fileUrl, { responseType: 'blob' }).toPromise();
