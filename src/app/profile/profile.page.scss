@@ -45,7 +45,11 @@
       width: 90%;
       margin-right: 30px;
     }
-  
+    .border{
+      border-color:#C7C7C7 !important;
+      border:0.5px;
+      border-style:solid;
+    }
     .edit-button:active {
       border-color: #dce2ed;
     }

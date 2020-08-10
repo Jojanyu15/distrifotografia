@@ -47,9 +47,9 @@
       <ion-card *ngIf="images?.length>0">
         <ion-grid>
           <ion-row>
-            <ion-col size="6" col-4 class="grid_img" *ngFor="let i of images"
+            <ion-col   class="border" size="6" col-4 class="grid_img" *ngFor="let i of images"
               (press)="pressPhoto(i?.creador, i?.creador, i?.photoCreador, i?.urlPath)">
-              <img [src]="i?.urlThumb" alt="">
+              <img  class="border" [src]="i?.urlThumb" alt="">
             </ion-col>
           </ion-row>
         </ion-grid>

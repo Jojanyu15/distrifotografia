@@ -8,20 +8,102 @@ const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const crypto = require('crypto');
 const mkdirpp = require('mkdirp-promise');
 const vision = require('@google-cloud/vision');
 // Max height and width of the thumbnail in pixels.
-const THUMB_MAX_HEIGHT = 400;
-const THUMB_MAX_WIDTH = 400;
+const THUMB_MAX_HEIGHT = 800;
+const THUMB_MAX_WIDTH = 800;
 // Thumbnail prefix added to file names.
 const THUMB_PREFIX = 'thumb_';
 const storage = admin.storage()
+const { Storage } = require('@google-cloud/storage');
 
 
 
 const VERY_UNLIKELY = 'VERY_UNLIKELY';
 const UNLIKELY = 'UNLIKELY';
 const BLURRED_FOLDER = 'blurred';
+
+/**
+ * When an image is uploaded in the Storage bucket the information and metadata of the image (the
+ * output of ImageMagick's `identify -verbose`) is saved in the Realtime Database.
+ */
+
+
+exports.metadata = functions.storage.object().onFinalize(async (object) => {
+  const filePath = object.name;
+  const buckett = admin.storage().bucket();
+  buckett.file(object.name).getMetadata().then((Metadata => {
+    console.log(Metadata);
+  }));
+
+  // Create random filename with same extension as uploaded file.
+  const randomFileName = crypto.randomBytes(20).toString('hex') + path.extname(filePath);
+  const tempLocalFile = path.join(os.tmpdir(), randomFileName);
+
+  // Exit if this is triggered on a file that is not an image.
+  if (!object.contentType.startsWith('image/')) {
+    console.log('This is not an image.');
+    return null;
+  }
+
+  let metadata;
+  // Download file from bucket.
+  const bucket = storage.bucket(object.bucket);
+  await bucket.file(filePath).download({ destination: tempLocalFile });
+  // Get Metadata from image.
+  const result = await spawn('identify', ['-verbose', tempLocalFile], { capture: ['stdout', 'stderr'] });
+  // Save metadata to realtime datastore.
+  metadata = imageMagickOutputToObject(result.stdout);
+  const safeKey = makeKeyFirebaseCompatible(filePath);
+  await admin.database().ref(safeKey).set(metadata);
+  console.log('Wrote to:', filePath, 'data:', metadata);
+  // Cleanup temp directory after metadata is extracted
+  // Remove the file from temp directory
+  await fs.unlinkSync(tempLocalFile)
+  return console.log('cleanup successful!');
+});
+
+/**
+ * Convert the output of ImageMagick's `identify -verbose` command to a JavaScript Object.
+ */
+function imageMagickOutputToObject(output) {
+  let previousLineIndent = 0;
+  const lines = output.match(/[^\r\n]+/g);
+  lines.shift(); // Remove First line
+  lines.forEach((line, index) => {
+    const currentIdent = line.search(/\S/);
+    line = line.trim();
+    if (line.endsWith(':')) {
+      lines[index] = makeKeyFirebaseCompatible(`"${line.replace(':', '":{')}`);
+    } else {
+      const split = line.replace('"', '\\"').split(': ');
+      split[0] = makeKeyFirebaseCompatible(split[0]);
+      lines[index] = `"${split.join('":"')}",`;
+    }
+    if (currentIdent < previousLineIndent) {
+      lines[index - 1] = lines[index - 1].substring(0, lines[index - 1].length - 1);
+      lines[index] = new Array(1 + (previousLineIndent - currentIdent) / 2).join('}') + ',' + lines[index];
+    }
+    previousLineIndent = currentIdent;
+  });
+  output = lines.join('');
+  output = '{' + output.substring(0, output.length - 1) + '}'; // remove trailing comma.
+  output = JSON.parse(output);
+  console.log('Metadata extracted from image', output);
+  return output;
+}
+
+/**
+ * Makes sure the given string does not contain characters that can't be used as Firebase
+ * Realtime Database keys such as '.' and replaces them by '*'.
+ */
+function makeKeyFirebaseCompatible(key) {
+  return key.replace(/\./g, '*');
+}
+
+
 
 /**
  * When an image is uploaded we check if it is flagged as Adult or Violence by the Cloud Vision
@@ -47,11 +129,13 @@ exports.blurOffensiveImages = functions.storage.object().onFinalize(async (objec
   // The current settings show the most strict configuration
   // Docs: https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1#google.cloud.vision.v1.SafeSearchAnnotation
   if (
-    safeSearch.adult != UNLIKELY ||
-    // safeSearch.spoof !== UNLIKELY ||
-    // safeSearch.medical !== UNLIKELY ||
-    safeSearch.violence != UNLIKELY ||
-    safeSearch.racy != UNLIKELY
+    safeSearch.adult == 'LIKELY' ||
+    safeSearch.violence == 'LIKELY' ||
+    safeSearch.adult == 'VERY_LIKELY' ||
+    safeSearch.violence == 'VERY_LIKELY' ||
+    safeSearch.racy == 'VERY_LIKELY' ||
+    safeSearch.adult == 'POSSIBLE' ||
+    safeSearch.violence == 'POSSIBLE'
   ) {
     console.log('Offensive image found. Blurring.');
     // return blurImage(object.name, object.bucket, object.metadata);
@@ -140,7 +224,8 @@ exports.generateThumbnail = functions.storage.object().onFinalize(async (object)
   await file.download({ destination: tempLocalFile });
   console.log('The file has been downloaded to', tempLocalFile);
   // Generate a thumbnail using ImageMagick.
-  await spawn('convert', [tempLocalFile, '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, tempLocalThumbFile], { capture: ['stdout', 'stderr'] });
+  await spawn('convert', [tempLocalFile, '-resize', '400x400', '-background', 'white','-gravity','center','-extent','400x400', tempLocalThumbFile], { capture: ['stdout', 'stderr'] });
+  // await spawn('convert', [tempLocalFile, '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, tempLocalThumbFile], { capture: ['stdout', 'stderr'] });
   console.log('Thumbnail created at', tempLocalThumbFile);
   // Uploading the Thumbnail.
   await bucket.upload(tempLocalThumbFile, { destination: thumbFilePath, metadata: metadata });

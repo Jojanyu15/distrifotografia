@@ -29,7 +29,9 @@ export class ModalresourcesComponent implements OnInit {
   }
   public goObjetos(){
     window.location.href="https://listado.mercadolibre.com.co/accesorios-para-fotografia#D[A:accesorios%20para%20fotografia]";
-
+  }
+  public goManual(){
+    window.location.href="https://drive.google.com/file/d/17eUSB6Co-lnuhXVGiyFnb3rA0h5dAJiP/view?usp=sharing";
   }
   ngOnInit() {}
 

@@ -115,10 +115,10 @@ export class TabsPage {
     this.fileEvent = event;
     let photoFile: any = this.pwaphoto.nativeElement.files[0];
     this.photoSvc.uploadAndGetThumb(photoFile).then(async filePath => {
-      this.loadvie.actionExecution('Identificando la fotografía');
+      this.loadvie.actionExecution('Identificando la fotografía...');
       await new Promise(resolve => 
         setTimeout(()=>
-        resolve(), 15000)
+        resolve(), 4500)
         )
         .then(()=>{
           this.loadvie.endExecution();
