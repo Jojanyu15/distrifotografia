@@ -83,7 +83,6 @@ export class ProfilePage {
   }
   async mostrarMenu(post: PhotoModel) {
     let buttons = [];
-    
     if (post.userUid == this.authSvc.getCurrentUser().uid) {
       let deleteButton = {
         cssClass: 'rojo',

@@ -15,7 +15,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 export class EditProfile{
   public user: ProfileModel;
   public form: FormGroup;
-  public formReady:boolean;
+  public formReady:boolean=false;
   constructor(private authSvc: AuthServiceService,
     private loadCtrl: LoadViewCtrl,
     private navCtrl: NavController,

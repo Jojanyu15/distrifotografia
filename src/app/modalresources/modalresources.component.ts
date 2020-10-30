@@ -18,7 +18,7 @@ export class ModalresourcesComponent implements OnInit {
     window.location.href="https://classroom.google.com/u/0/w/Nzk3MTk2MjA1NTRa/t/all";
   }
   public goOVA(){
-
+    window.location.href="https://roac.acacia.red/object/listObjectsByArea#Bellas%20Artes";
   }
   public goHumHub(){
     window.location.href="https://rita.udistrital.edu.co/colabora-acacia/index.php?r=space%2Fspace&sguid=46a175ac-86c6-437e-9fc0-02d473ce51c1";

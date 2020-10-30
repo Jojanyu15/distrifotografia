@@ -1,99 +1,99 @@
 <ion-header>
 
 
-  <ion-toolbar text-center>
-    <ion-buttons slot="start">
-      <ion-button>
-        <img slot="start" class="escudo" src="../../assets/icons/escudoUD.svg">
-      </ion-button>
-    </ion-buttons>
-    <ion-title>
-      <img class="title" src="../../assets/icons/distrifotografia.svg">
-    </ion-title>
-  </ion-toolbar>
+    <ion-toolbar text-center>
+        <ion-buttons slot="start">
+            <ion-button>
+                <img slot="start" class="escudo" src="../../assets/icons/escudoUD.svg">
+            </ion-button>
+        </ion-buttons>
+        <ion-title>
+            <img class="title" src="../../assets/icons/distrifotografia.svg">
+        </ion-title>
+    </ion-toolbar>
 </ion-header>
 <ion-content class="contenido">
-  <ion-item text-wrap>
-    <ion-label color="primary" position="center">Categoría</ion-label>
-    <ion-select interface="popover" placeholder="" [(ngModel)]="scateg" (ionChange)="optionsFn();">
-      <ion-select-option *ngFor="let categoria of categorias" value="{{categoria.value}}">{{categoria.key}}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item text-wrap>
+        <ion-label color="primary" position="center">Categoría</ion-label>
+        <ion-select interface="popover" placeholder="" [(ngModel)]="scateg" (ionChange)="optionsFn();">
+            <ion-select-option *ngFor="let categoria of categorias" value="{{categoria.value}}">{{categoria.key}}
+            </ion-select-option>
+        </ion-select>
+    </ion-item>
 
-  <!-- <interface="action-sheet"*></interface> -->
-  <ion-grid *ngIf="posts?.length==0">
-    <ion-row>
-      <ion-col text-center class="caja-vacia">
-        <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
-        <p>No hay ninguna fotografía por ahora, ¡Publica una!</p>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+    <!-- <interface="action-sheet"*></interface> -->
+    <ion-grid *ngIf="posts?.length==0">
+        <ion-row>
+            <ion-col text-center class="caja-vacia">
+                <ion-icon class="icono-grande" name="ios-sunny"></ion-icon>
+                <p>No hay ninguna fotografía por ahora, ¡Publica una!</p>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
 
-  <div *ngFor="let post of posts let l = count">
+    <div *ngFor="let post of posts let l = count">
 
-    <ion-card *ngIf="post?.categoria==scateg">
-      <ion-item (click)="goProfile(post.userUid)">
-        <ion-avatar slot="start">
-          <img [src]="post?.photoCreador">
-        </ion-avatar>
-        <ion-label>{{post?.creador}} </ion-label>
-        <ion-button (click)="mostrarMenu(post)" fill="clear">
-          <ion-icon name="options"></ion-icon>
-        </ion-button>
-      </ion-item>
-      <ion-card-content style="padding: 0;">
-        <img [src]="post?.urlThumb">
-      </ion-card-content>
-      <div>
-        <ion-segment>
-          <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
-            <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
-            <ion-label class="fontz">Ver en HD</ion-label>
-          </ion-segment-button>
-          <ion-segment-button (click)="verComentarios(post)">
-            <ion-icon name="text"></ion-icon>
-            <ion-label class="fontz">Comentarios</ion-label>
-          </ion-segment-button>
-          <ion-segment-button (click)="goMetadata(post)">
-            <ion-icon name="information-circle-outline"></ion-icon>
-            <ion-label class="fontz">Metadatos</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
-    </ion-card>
+        <ion-card *ngIf="post?.categoria==scateg">
+            <ion-item>
+                <ion-avatar slot="start">
+                    <img [src]="post?.photoCreador">
+                </ion-avatar>
+                <ion-label>{{post?.creador}} </ion-label>
+                <ion-button (click)="mostrarMenu(post)" fill="clear">
+                    <ion-icon name="options"></ion-icon>
+                </ion-button>
+            </ion-item>
+            <ion-card-content style="padding: 0;">
+                <img [src]="post?.urlThumb">
+            </ion-card-content>
+            <div>
+                <ion-segment>
+                    <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
+                        <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+                        <ion-label class="fontz">Ver en HD</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button (click)="verComentarios(post)">
+                        <ion-icon name="text"></ion-icon>
+                        <ion-label class="fontz">Comentarios</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button (click)="goMetadata(post)">
+                        <ion-icon name="information-circle-outline"></ion-icon>
+                        <ion-label class="fontz">Metadatos</ion-label>
+                    </ion-segment-button>
+                </ion-segment>
+            </div>
+        </ion-card>
 
-    <ion-card *ngIf="scateg==''">
-      <ion-item>
-        <ion-avatar (click)="goProfile(post.userUid)" slot="start">
-          <img [src]="post?.photoCreador">
-        </ion-avatar>
-        <ion-label>{{post?.creador}}</ion-label>
-        <ion-button (click)="mostrarMenu(post)" fill="clear">
-          <ion-icon name="options"></ion-icon>
-        </ion-button>
-      </ion-item>
-      <ion-card-content style="padding: 0;">
-        <img [src]="post?.urlThumb">
-      </ion-card-content>
-      <div>
-        <ion-segment>
-          <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
-            <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
-            <ion-label class="fontz">Ver en HD</ion-label>
-          </ion-segment-button>
-          <ion-segment-button (click)="verComentarios(post)">
-            <ion-icon name="text"></ion-icon>
-            <ion-label class="fontz">Comentarios</ion-label>
-          </ion-segment-button>
-          <ion-segment-button (click)="goMetadata(post)">
-            <ion-icon name="information-circle-outline"></ion-icon>
-            <ion-label class="fontz">Metadatos</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-      </div>
-    </ion-card>
+        <ion-card *ngIf="scateg==''">
+            <ion-item>
+                <ion-avatar (click)="goProfile(post.userUid)" slot="start">
+                    <img [src]="post?.photoCreador">
+                </ion-avatar>
+                <ion-label>{{post?.creador}}</ion-label>
+                <ion-button (click)="mostrarMenu(post)" fill="clear">
+                    <ion-icon name="options"></ion-icon>
+                </ion-button>
+            </ion-item>
+            <ion-card-content style="padding: 0;">
+                <img [src]="post?.urlThumb">
+            </ion-card-content>
+            <div>
+                <ion-segment>
+                    <ion-segment-button [disabled]="post?.urlPath?.length<50" (click)="goHD(post)">
+                        <ion-icon src="https://image.flaticon.com/icons/svg/1837/1837553.svg"></ion-icon>
+                        <ion-label class="fontz">Ver en HD</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button (click)="verComentarios(post)">
+                        <ion-icon name="text"></ion-icon>
+                        <ion-label class="fontz">Comentarios</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button (click)="goMetadata(post)">
+                        <ion-icon name="information-circle-outline"></ion-icon>
+                        <ion-label class="fontz">Metadatos</ion-label>
+                    </ion-segment-button>
+                </ion-segment>
+            </div>
+        </ion-card>
 
-  </div>
+    </div>
 </ion-content>
